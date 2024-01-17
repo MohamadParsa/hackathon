@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -27,6 +30,7 @@ func setupRouter() *gin.Engine {
 	r.GET("/items/:id", getQuickAccess)
 	r.PUT("/items/:id", updateQuickAccess)
 	r.DELETE("/items/:id", deleteQuickAccess)
+	r.POST("/upload", uploadHandler)
 
 	return r
 }
@@ -103,6 +107,35 @@ func deleteQuickAccess(c *gin.Context) {
 
 	db.Delete(&item)
 	c.JSON(http.StatusNoContent, nil)
+}
+
+func uploadHandler(c *gin.Context) {
+	file, handler, err := c.Request.FormFile("uploadfile")
+	if err != nil {
+		fmt.Println("Error retrieving the file:", err)
+		c.String(http.StatusBadRequest, "Error retrieving the file")
+		return
+	}
+	defer file.Close()
+
+	// Save the uploaded file
+	filename := filepath.Join("./uploads", handler.Filename)
+	out, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("Error creating the file:", err)
+		c.String(http.StatusInternalServerError, "Error creating the file")
+		return
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		fmt.Println("Error copying the file:", err)
+		c.String(http.StatusInternalServerError, "Error copying the file")
+		return
+	}
+
+	c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully!", handler.Filename))
 }
 
 func main() {
