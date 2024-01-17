@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/MohamadParsa/hackathon/internal/model"
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -24,10 +25,94 @@ func New(src string) (*Adapter, error) {
 }
 
 func (adapter *Adapter) GetQuickAccessList(user string) []*model.QuickAccess {
-	return []*model.QuickAccess{{}}
+	return []*model.QuickAccess{
+		{
+			Id:      uuid.New().String(),
+			UserId:  user,
+			Type:    "taxi",
+			Picture: "",
+			Action: &model.Action{
+				Id:            uuid.New().String(),
+				OrderId:       uuid.New().String(),
+				ActionCommand: "",
+			},
+			Title: "خونه عباس",
+		},
+		{
+			Id:      uuid.New().String(),
+			UserId:  user,
+			Type:    "food",
+			Picture: "",
+			Action: &model.Action{
+				Id:            uuid.New().String(),
+				OrderId:       uuid.New().String(),
+				ActionCommand: "",
+			},
+			Title: "نان - خونه",
+		},
+		{
+			Id:      uuid.New().String(),
+			UserId:  user,
+			Type:    "taxi",
+			Picture: "",
+			Action: &model.Action{
+				Id:            uuid.New().String(),
+				OrderId:       uuid.New().String(),
+				ActionCommand: "",
+			},
+			Title: "خونه علی",
+		},
+		{
+			Id:      uuid.New().String(),
+			UserId:  user,
+			Type:    "taxi",
+			Picture: "",
+			Action: &model.Action{
+				Id:            uuid.New().String(),
+				OrderId:       uuid.New().String(),
+				ActionCommand: "",
+			},
+			Title: "سارا",
+		},
+		{
+			Id:      uuid.New().String(),
+			UserId:  user,
+			Type:    "food",
+			Picture: "",
+			Action: &model.Action{
+				Id:            uuid.New().String(),
+				OrderId:       uuid.New().String(),
+				ActionCommand: "",
+			},
+			Title: "گوشت خونه",
+		},
+		{
+			Id:      uuid.New().String(),
+			UserId:  user,
+			Type:    "food",
+			Picture: "",
+			Action: &model.Action{
+				Id:            uuid.New().String(),
+				OrderId:       uuid.New().String(),
+				ActionCommand: "",
+			},
+			Title: "چلوبرگ فرشته",
+		},
+	}
 }
 func (adapter *Adapter) GetSpecificQuickAccess(user string, id string) *model.QuickAccess {
-	return &model.QuickAccess{}
+	return &model.QuickAccess{
+		Id:      uuid.New().String(),
+		UserId:  user,
+		Type:    "taxi",
+		Picture: "",
+		Action: &model.Action{
+			Id:            uuid.New().String(),
+			OrderId:       uuid.New().String(),
+			ActionCommand: "",
+		},
+		Title: "خونه عباس",
+	}
 
 }
 func (adapter *Adapter) InsertQuickAccess(quickAccess *model.QuickAccess) error {
