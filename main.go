@@ -3,13 +3,25 @@ package main
 import (
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/MohamadParsa/hackathon/internal/adapter/in/restFull"
+	"github.com/MohamadParsa/hackathon/internal/adapter/out/db"
+	"github.com/MohamadParsa/hackathon/internal/application/quickAccess"
+	"github.com/MohamadParsa/hackathon/internal/application/suggestion"
 	"github.com/spf13/viper"
 )
 
 func main() {
 	configViper()
-	restFullServer := restFull.New()
+	dbAdapter, err := db.New("")
+	if err != nil {
+		log.Error("error in db", err)
+	}
+	quickAccessApplication := quickAccess.New(dbAdapter)
+	suggestionApplication := suggestion.New()
+
+	restFullServer := restFull.New(quickAccessApplication, suggestionApplication)
 	restFullServer.Serve(viper.GetString("serverPort"))
 }
 func configViper() {
