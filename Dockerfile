@@ -1,23 +1,23 @@
-# Use the official Golang image as the base image
+# Use the official Golang image
 FROM golang:latest
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Go modules files
-COPY go.mod go.sum ./
-
-# Download and install Go modules
-RUN go mod download
-
-# Copy the source code into the container
+# Copy the local package files to the container
 COPY . .
+
+# Download and install any required dependencies
+RUN go get -u github.com/gin-gonic/gin
+RUN go get -u gorm.io/gorm
+RUN go get -u gorm.io/driver/postgres
 
 # Build the Go application
 RUN go build -o main .
 
-# Expose the port on which the application will run
-# EXPOSE 8080
+# Expose port 8080 to the outside world
+EXPOSE 8080
 
 # Command to run the executable
 CMD ["./main"]
+
