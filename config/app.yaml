@@ -1,1 +1,7 @@
 serverPort: ":9000"
+
+AWS_REGION: "us-east-2"
+AWS_ACCESS_KEY : "8o66h84f9tr3hsir"
+AWS_SECRET_KEY : "df2b013e-7802-4db3-975a-345428a0bc39"
+AWS_ENDPOINT : "https://storage.iran.liara.space"
+AWS_BUCKET_NAME : "hackathon"

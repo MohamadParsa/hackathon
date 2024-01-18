@@ -1,6 +1,10 @@
 package port
 
-import "github.com/MohamadParsa/hackathon/internal/model"
+import (
+	"io"
+
+	"github.com/MohamadParsa/hackathon/internal/model"
+)
 
 type QuickAccessApi interface {
 	GetQuickAccessList(user string) ([]byte, int)
@@ -8,6 +12,8 @@ type QuickAccessApi interface {
 	AddQuickAccess(quickAccess model.QuickAccess) int
 	UpdateQuickAccess(quickAccess model.QuickAccess) int
 	DeleteQuickAccess(user string, id string) int
+	PurcahseHistory(user string, serviceType string) ([]byte, int)
+	UploadFile(fileContent io.Reader, fileName string) ([]byte, int)
 }
 type SuggestionApi interface {
 	GetSuggestionList(user string) ([]byte, int)

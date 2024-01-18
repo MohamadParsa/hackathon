@@ -29,7 +29,7 @@ func (adapter *Adapter) GetQuickAccessList(user string) []*model.QuickAccess {
 		{
 			Id:      uuid.New().String(),
 			UserId:  user,
-			Type:    "taxi",
+			Type:    "cab",
 			Picture: "",
 			Action: &model.Action{
 				Id:            uuid.New().String(),
@@ -53,7 +53,7 @@ func (adapter *Adapter) GetQuickAccessList(user string) []*model.QuickAccess {
 		{
 			Id:      uuid.New().String(),
 			UserId:  user,
-			Type:    "taxi",
+			Type:    "cab",
 			Picture: "",
 			Action: &model.Action{
 				Id:            uuid.New().String(),
@@ -65,7 +65,7 @@ func (adapter *Adapter) GetQuickAccessList(user string) []*model.QuickAccess {
 		{
 			Id:      uuid.New().String(),
 			UserId:  user,
-			Type:    "taxi",
+			Type:    "cab",
 			Picture: "",
 			Action: &model.Action{
 				Id:            uuid.New().String(),
@@ -104,7 +104,7 @@ func (adapter *Adapter) GetSpecificQuickAccess(user string, id string) *model.Qu
 	return &model.QuickAccess{
 		Id:      uuid.New().String(),
 		UserId:  user,
-		Type:    "taxi",
+		Type:    "cab",
 		Picture: "",
 		Action: &model.Action{
 			Id:            uuid.New().String(),

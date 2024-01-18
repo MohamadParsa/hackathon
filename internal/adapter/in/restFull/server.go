@@ -6,6 +6,7 @@
 package restFull
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/MohamadParsa/hackathon/internal/model"
@@ -37,7 +38,8 @@ func New(quickAccess port.QuickAccessApi, suggestion port.SuggestionApi) *Adapte
 
 func (adapter *Adapter) Serve(port string) {
 	router := gin.New()
-
+	router.MaxMultipartMemory = 8 << 20
+	router.Use(CORSMiddleware())
 	setHealthMethod(router)
 
 	routerV1 := router.Group("/v1")
@@ -50,17 +52,32 @@ func (adapter *Adapter) Serve(port string) {
 		log.Errorf("error on server listening: %v", err)
 	}
 }
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
 func (adapter *Adapter) setAPIMethodsV1(router *gin.RouterGroup) {
 	router.GET("/quick-access/", adapter.getAllQuickAccess)
 	router.GET("/quick-access/:quickAccessId", adapter.getSpecificQuickAccess) // list quick access
 	router.POST("/quick-access/", adapter.addQuickAccess)                      // http status
 	router.PATCH("/quick-access/", adapter.modifyQuickAccess)                  // http status
 	router.DELETE("/quick-access/:quickAccessId", adapter.deleteQuickAccess)   // http status
+	router.GET("/purchase-history/", adapter.purcahseHistory)                  // http status
+	router.GET("/purchase-history/:serviceType", adapter.purcahseHistory)      // http status
+	router.GET("/suggestion", adapter.getSuggestionList)                       // list suggestion
 
-	router.GET("/suggestion", adapter.getSuggestionList) // list suggestion
-
-	// router.PUT("/update-file")
+	router.POST("/update-file", adapter.uploadFile)
 
 }
 func (adapter *Adapter) getAllQuickAccess(c *gin.Context) {
@@ -74,7 +91,8 @@ func (adapter *Adapter) getAllQuickAccess(c *gin.Context) {
 }
 func (adapter *Adapter) getSpecificQuickAccess(c *gin.Context) {
 	user := getUser(c.Request.Header)
-	id := c.Param("id")
+	id := c.Param("quickAccessId")
+	fmt.Println(id, user)
 	if user != "" && id != "" {
 		jsonByte, statusCode := adapter.quickAccess.GetSpecificQuickAccess(user, id)
 		writeResponseWithStatusCode(c, jsonByte, statusCode)
@@ -110,10 +128,20 @@ func (adapter *Adapter) modifyQuickAccess(c *gin.Context) {
 }
 func (adapter *Adapter) deleteQuickAccess(c *gin.Context) {
 	user := getUser(c.Request.Header)
-	id := c.Param("id")
+	id := c.Param("quickAccessId")
 	if user != "" && id != "" {
 		statusCode := adapter.quickAccess.DeleteQuickAccess(user, id)
 		writeResponseWithStatusCode(c, nil, statusCode)
+	} else {
+		writeResponseWithStatusCode(c, nil, http.StatusBadRequest)
+	}
+}
+func (adapter *Adapter) purcahseHistory(c *gin.Context) {
+	user := getUser(c.Request.Header)
+	serviceType := c.Param("serviceType")
+	if user != "" {
+		jsonByte, statusCode := adapter.quickAccess.PurcahseHistory(user, serviceType)
+		writeResponseWithStatusCode(c, jsonByte, statusCode)
 	} else {
 		writeResponseWithStatusCode(c, nil, http.StatusBadRequest)
 	}
@@ -126,6 +154,24 @@ func (adapter *Adapter) getSuggestionList(c *gin.Context) {
 	} else {
 		writeResponseWithStatusCode(c, nil, http.StatusBadRequest)
 	}
+}
+func (adapter *Adapter) uploadFile(c *gin.Context) {
+	file, err := c.FormFile("uploadFile")
+	if err != nil {
+		log.Error("1", err)
+		writeResponseWithStatusCode(c, nil, http.StatusBadRequest)
+		return
+	}
+	fileContent, err := file.Open()
+	if err == nil {
+		jsonByte, statusCode := adapter.quickAccess.UploadFile(fileContent, file.Filename)
+		writeResponseWithStatusCode(c, jsonByte, statusCode)
+	} else {
+		log.Error("2", err)
+
+		writeResponseWithStatusCode(c, nil, http.StatusBadRequest)
+	}
+
 }
 func writeResponseWithStatusCode(c *gin.Context, jsonByteResult []byte, statusCode int) {
 
