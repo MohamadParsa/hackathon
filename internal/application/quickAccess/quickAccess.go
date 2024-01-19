@@ -99,6 +99,8 @@ func (quickAccess *QuickAccess) PurcahseHistory(user string, serviceType string)
 	return byteResult, http.StatusOK
 }
 func (quickAccess *QuickAccess) AddQuickAccess(item model.QuickAccess) int {
+	item.Id = uuid.NewString()
+	item.Action.Id = uuid.NewString()
 	err := quickAccess.db.InsertQuickAccess(&item)
 	if err != nil {
 		log.Errorf("InsertQuickAccess returns error: %v", err)

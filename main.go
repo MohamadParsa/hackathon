@@ -14,7 +14,7 @@ import (
 
 func main() {
 	configViper()
-	dbAdapter, err := db.New("")
+	dbAdapter, err := db.New("postgresql://root:SgAyaKgLgNzOpW4GDh4TnixU@makalu.liara.cloud:30005/postgres")
 	if err != nil {
 		log.Error("error in db", err)
 	}

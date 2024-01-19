@@ -1,5 +1,11 @@
 package model
 
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+)
+
 type Action struct {
 	Id            string `json:"id"`
 	OrderId       string `json:"orderId"`
@@ -15,10 +21,11 @@ type QuickAccess struct {
 }
 
 type PurcahseHistory struct {
-	OrderId     string `json:"orderId"`
-	Type        string `json:"type"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	OrderId       string `json:"orderId"`
+	QuickAccessId string `json:"-"`
+	Type          string `json:"type"`
+	Title         string `json:"title"`
+	Description   string `json:"description"`
 }
 
 type PurcahseHistoryList []*PurcahseHistory
@@ -31,4 +38,25 @@ func (purcahseHistoryList PurcahseHistoryList) FilerByType(serviceType string) P
 		}
 	}
 	return list
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (a *Action) Scan(value interface{}) error {
+	source, ok := value.([]byte)
+	if !ok {
+		return errors.New("Type assertion .([]byte) failed.")
+	}
+
+	var i Action
+	err := json.Unmarshal(source, &i)
+	if err != nil {
+		return err
+	}
+	*a = i
+	return nil
+}
+
+// Value return json value, implement driver.Valuer interface
+func (a Action) Value() (driver.Value, error) {
+	return json.Marshal(a)
 }
